@@ -1,4 +1,3 @@
-import time
 import allure
 from helpers import _payload
 from clases.pet import Pet
@@ -15,7 +14,7 @@ def test_get_pets(url_api, _payload):
     params = {"status": _payload['status']}
     response = pet.get_pets(url_api + '/findByStatus', params=params)
     Allure.logining_allure_response_json(result=response, name="Response body")  # логирование response в allure
-    logging.info( f"Method: GET, URL: {response.url}, Status: {response.status_code}, Params: {params}")  # логирование в консоль
+    logging.info(f"Method: GET, URL: {response.url}, Status: {response.status_code}, Params: {params}")  # логирование в консоль
     assert response.status_code == 200
 
 
@@ -34,18 +33,15 @@ def test_get_pet_id(url_api, _payload):
         Allure.logining_allure_response_json(response, name="Response")  # логирование response в allure
     assert response.status_code == 200
     assert response.json()['name'] == _payload['name']
-    #time.sleep(10)  ## слипаю, так как API-сервис нестабилен и может не учитывать передаваемые параметры, если метод создания вызывается несколько раз подряд
 
 
 @allure.story('Создание питомца')
 @allure.title('Создаем питомца и проверяем, что питомец создался корректно.')
 def test_post_create_pet(url_api, _payload):
-    ## Важно! Запрос на создание питомца иногда может падать - API-сервис нестабилен и иногда может игнорировать
-    # передаваемые параметры (если отправить запрос на создание питомца несколько раз подряд).
     with allure.step('Создаем питомца'):
         Allure.logining_allure_request_json(request_body=_payload, name='Request')
         response_post_pet = pet.create_pet(url=url_api, payload=_payload)
-        logging.info(f"Method: POST, URL: {response_post_pet.url}, Status: {response_post_pet.status_code}")  # логирование в консоль
+        logging.info( f"Method: POST, URL: {response_post_pet.url}, Status: {response_post_pet.status_code}")  # логирование в консоль
         Allure.logining_allure_response_json(response_post_pet, name="Response")  # логирование response в allure
         name_pet = response_post_pet.json()['name']  ## получаем имя питомца и потом его ассертим
     with allure.step('Получаем id созданного питомца и передаем его в get-запроc.'):
@@ -60,20 +56,16 @@ def test_post_create_pet(url_api, _payload):
         delete_new_pet = pet.delete_pet(url=url_api, id_pet=id_new_pet)
         logging.info(f"Method: DELETE, URL: {delete_new_pet.url}, Status: {delete_new_pet.status_code}")  # логирование в консоль
         AllurePet.allure_logining_delete_pet(id_pet=id_new_pet, result=delete_new_pet, name='Response')
-    #time.sleep(10)  ## слипаю, так как API-сервис нестабилен и может не учитывать передаваемые параметры, если метод создания вызывается несколько раз подряд
 
 
 @allure.story('Изменение параметров питомца')
 @allure.title('Создаем питомца и меняем его имя.')
 def test_update_pet(url_api, _payload):
-    ## Важно! Запрос на создание питомца иногда может падать - API-сервис нестабилен и иногда может игнорировать
-    # передаваемые параметры (если отправить запрос на создание питомца несколько раз подряд).
     with allure.step('Создаем питомца'):
         Allure.logining_allure_request_json(request_body=_payload, name='Request')
         response_post_pet = pet.create_pet(url=url_api, payload=_payload)
         logging.info(f"Method: POST, URL: {response_post_pet.url}, Status: {response_post_pet.status_code}")  # логирование в консоль
         Allure.logining_allure_response_json(response_post_pet, name="Response")  # логирование response в allure
-        #time.sleep(10)  ## слипаю, так как API-сервис нестабилен и может не учитывать передаваемые параметры, если метод создания вызывается несколько раз подряд
     with allure.step('Получаем id созданного питомца, передаем его в PUT-запрос'):
         id_new_pet = response_post_pet.json()['id']
         update_data = {"name": 'AQA'}
@@ -90,7 +82,6 @@ def test_update_pet(url_api, _payload):
         delete_new_pet = pet.delete_pet(url=url_api, id_pet=id_new_pet)
         logging.info(f"Method: DELETE, URL: {delete_new_pet.url}, Status: {delete_new_pet.status_code}")  # логирование в консоль
         AllurePet.allure_logining_delete_pet(id_pet=id_new_pet, result=delete_new_pet, name='Response')
-        #time.sleep(10)  ## слипаю, так как API-сервис нестабилен и может не учитывать передаваемые параметры, если метод создания вызывается несколько раз подряд
 
 
 @allure.story('Удаление питомца')
